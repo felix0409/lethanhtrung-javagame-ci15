@@ -1,5 +1,6 @@
 import game.GamePanel;
 import game.GameWindow;
+import game.Settings;
 import game.Vector2D;
 
 import javax.swing.*;
@@ -15,12 +16,13 @@ public class Program {
     public static void main(String[] args) {
         GameWindow window = new GameWindow();
         window.setTitle("Game Touhou");
-//        window.setSize(800, 600);
         window.setResizable(false);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         GamePanel panel = new GamePanel();
-        panel.setPreferredSize(new Dimension(800, 600));
+        panel.setPreferredSize(
+                new Dimension(Settings.GAME_WIDTH, Settings.GAME_HEIGHT)
+        );
         window.add(panel);
         window.pack();
         panel.setBackground(Color.CYAN);

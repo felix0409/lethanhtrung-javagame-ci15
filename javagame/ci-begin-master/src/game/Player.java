@@ -5,135 +5,87 @@ import tklibs.SpriteUtils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Random;
 
-public class Player {
-    BufferedImage image;
-    Vector2D position;
-    ArrayList<PlayerBullet> bullets;
+public class Player extends GameObject {
     int fireCount;
-    BufferedImage bulletType2Image;
-    BufferedImage bulletType3Image;
-    BufferedImage bulletType4Image;
-    BufferedImage bulletType5Image;
+    int bulletType;
+    int changeBulletCount;
+    Random random;
 
     public Player() {
         image = SpriteUtils.loadImage("assets/images/players/straight/0.png");
-        position = new Vector2D(200, 500);
-//        bulletImage = SpriteUtils.loadImage("assets/images/player-bullets/a/1.png");
-//        bulletPositions = new ArrayList<>();
-        bullets = new ArrayList<>();
+        position.set(200, 500);
         fireCount = 0;
-        bulletType2Image = SpriteUtils.loadImage("assets/images/enemies/bullets/cyan.png");
-        bulletType5Image = SpriteUtils.loadImage("assets/images/enemies/bullets/white.png");
-        bulletType3Image = SpriteUtils.loadImage("assets/images/enemies/bullets/pink.png");
-        bulletType4Image = SpriteUtils.loadImage("assets/images/enemies/bullets/yellow.png");
+        bulletType = 1;
+        changeBulletCount = 0;
+        random = new Random();
     }
 
-    public void render(Graphics g) {
-        g.drawImage(
-                image,
-                (int) position.x,
-                (int) position.y,
-                null
-        );
-//        for(int i = 0; i < bulletPositions.size(); i++) {
-//            Vector2D bulletPosition = bulletPositions.get(i);
-//            g.drawImage(
-//                    bulletImage,
-//                    (int) bulletPosition.x,
-//                    (int) bulletPosition.y,
-//                    null
-//            );
-//        }
-        for (int i = 0; i < bullets.size(); i++) {
-            PlayerBullet bullet = bullets.get(i);
-            bullet.render(g);
-        }
-    }
-
-    private void bulletsRun() {
-//        for(int i = 0; i < bulletPositions.size(); i++) {
-//            Vector2D bulletPosition = bulletPositions.get(i);
-//            bulletPosition.y -= 3;
-//        }
-        for (int i = 0; i < bullets.size(); i++) {
-            PlayerBullet bullet = bullets.get(i);
-            bullet.run();
-        }
-    }
-
+    @Override
     public void run() {
+        super.run();
         playerMove();
         playerLimit();
         playerFire();
-        bulletsRun();
+        changeBulletType();
     }
 
-    private void playerFire() {
-        fireCount++;
-        if(GameWindow.isFirePress && fireCount > 20) {
-//            Vector2D bulletPosition = new Vector2D(position.x, position.y);
-//            bulletPositions.add(bulletPosition);
-            PlayerBullet bullet1 = new PlayerBullet();
-            bullet1.position.set(this.position.x, this.position.y);
-            bullet1.velocity.setAngle(-Math.PI * 0.5);
-            bullets.add(bullet1);
+    private void playerMove() {
+        int vX = 0;
+        int vY = 0;
 
-            PlayerBullet bullet2 = new PlayerBullet();
-            bullet2.image = bulletType2Image;
-            bullet2.position.set(this.position.x, this.position.y);
-            bullet2.velocity.setAngle(-Math.PI * 0.6);
-            bullets.add(bullet2);
-
-            PlayerBullet bullet3 = new PlayerBullet();
-            bullet3.image = bulletType3Image;
-            bullet3.position.set(this.position.x, this.position.y);
-            bullet3.velocity.setAngle(-Math.PI * 0.4);
-            bullets.add(bullet3);
-
-            PlayerBullet bullet4 = new PlayerBullet();
-            bullet4.image = bulletType4Image;
-            bullet4.position.set(this.position.x, this.position.y);
-            bullet4.velocity.setAngle(-Math.PI * 0.3);
-            bullets.add(bullet4);
-
-            PlayerBullet bullet5 = new PlayerBullet();
-            bullet5.image = bulletType5Image;
-            bullet5.position.set(this.position.x, this.position.y);
-            bullet5.velocity.setAngle(-Math.PI * 0.7);
-            bullets.add(bullet5);
-
-            fireCount = 0;
+        if(GameWindow.isUpPress) { // player move
+            vY--;
         }
+        if(GameWindow.isRightPress) {
+            vX++;
+        }
+        if(GameWindow.isDownPress) {
+            vY++;
+        }
+        if(GameWindow.isLeftPress) {
+            vX--;
+        }
+
+        this.velocity.set(vX, vY);
+        this.velocity.setLength(1);
     }
 
     private void playerLimit() {
         if(position.x < 0) { // limit player
             position.x = 0;
         }
-        if(position.x > 384 - 32) {
-            position.x = 384 - 32;
+        if(position.x > Settings.BACKGROUND_WIDTH - Settings.PLAYER_WIDTH) {
+            position.x = Settings.BACKGROUND_WIDTH - Settings.PLAYER_WIDTH;
         }
         if(position.y < 0) {
             position.y = 0;
         }
-        if(position.y > 600 - 48) {
-            position.y = 600 - 48;
+        if(position.y > Settings.GAME_HEIGHT - Settings.PLAYER_HEIGHT) {
+            position.y = Settings.GAME_HEIGHT - Settings.PLAYER_HEIGHT;
         }
     }
 
-    private void playerMove() {
-        if(GameWindow.isUpPress) { // player move
-            position.y--;
+    private void playerFire() {
+        fireCount++;
+        if(GameWindow.isFirePress && fireCount > 20) {
+            for (int i = 0; i < 1; i++) {
+                PlayerBullet bullet = new PlayerBullet();
+                bullet.loadImageByType(bulletType);
+                bullet.position.set(this.position.x, this.position.y);
+                bullet.velocity.setAngle(-Math.PI * 0.5);
+            }
+
+            fireCount = 0;
         }
-        if(GameWindow.isRightPress) {
-            position.x++;
-        }
-        if(GameWindow.isDownPress) {
-            position.y++;
-        }
-        if(GameWindow.isLeftPress) {
-            position.x--;
+    }
+
+    private void changeBulletType() {
+        changeBulletCount++;
+        if(changeBulletCount > 300) {
+            bulletType = 1 + random.nextInt(3);
+            changeBulletCount = 0;
         }
     }
 }

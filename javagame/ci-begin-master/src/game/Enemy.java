@@ -2,44 +2,32 @@ package game;
 
 import tklibs.SpriteUtils;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-
-public class Enemy {
-    BufferedImage image;
-    Vector2D position;
-    Vector2D velocity;
+public class Enemy extends GameObject {
 
     public Enemy() {
         image = SpriteUtils.loadImage("assets/images/enemies/level0/pink/0.png");
-        position = new Vector2D(-50, -50);
-        velocity = new Vector2D(2, 2);
+        position.set(-50, -50);
+        velocity.set(2, 2);
         velocity.setAngle(Math.PI / 18);
-        velocity.setLength(3);
+        velocity.setLength(Settings.ENEMY_SPEED);
     }
 
-    public void render(Graphics g) {
-        g.drawImage(
-                image,
-                (int) position.x,
-                (int) position.y,
-                null
-        );
-    }
-
+    @Override
     public void run() {
-        position.add(velocity.x, velocity.y);
+        super.run();
         changeVelocity();
     }
 
     private void changeVelocity() {
-        if(position.x > 384 - 28 && velocity.x > 0) {
+        if(position.x > Settings.BACKGROUND_WIDTH - Settings.ENEMY_WIDTH
+                && velocity.x > 0) {
             velocity.set(-velocity.x, velocity.y);
         }
         if(position.x < 0 && velocity.x < 0) {
             velocity.set(-velocity.x, velocity.y);
         }
-        if(position.y > 600 - 28 && velocity.y > 0) {
+        if(position.y > Settings.GAME_HEIGHT - Settings.ENEMY_HEIGHT
+                && velocity.y > 0) {
             velocity.set(velocity.x, -velocity.y);
         }
         if(position.y < 0 && velocity.y < 0) {
