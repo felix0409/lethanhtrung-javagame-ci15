@@ -1,5 +1,9 @@
-package game;
+package game.enemy;
 
+import game.GameObject;
+import game.player.Player;
+import game.Settings;
+import game.Vector2D;
 import tklibs.SpriteUtils;
 
 public class Enemy extends GameObject {
@@ -11,23 +15,31 @@ public class Enemy extends GameObject {
         velocity.set(2, 2);
         velocity.setAngle(Math.PI / 18);
         velocity.setLength(Settings.ENEMY_SPEED);
+        fireCount = 0;
     }
 
     @Override
     public void run() {
         super.run();
         changeVelocity();
-        enemyFire();
+        fire();
     }
 
-    private void enemyFire() {
+    private void fire() {
         fireCount++;
-        if(fireCount > 20) {
-            for (int i = 0; i < 1 ; i++) {
-                EnemyBullet bullet = new EnemyBullet();
-                bullet.position.set(this.position.x, this.position.y);
-                bullet.velocity.setAngle(Math.PI * 0.4);
-            }
+        if(fireCount > 10) {
+            // 1. Tao ra vien dan
+            EnemyBullet bullet = GameObject.recycle(EnemyBullet.class);
+            bullet.position.set(this.position);
+
+            // 2. Tinh toan vector tro tu Enemy >> den Player
+            Player player = GameObject.find(Player.class);
+            Vector2D enemyToPlayer = player.position.clone();
+            enemyToPlayer.minus(this.position);
+            enemyToPlayer.setLength(4);
+
+            // 3. Dat bullet velocity = vector vua tinh toan
+            bullet.velocity.set(enemyToPlayer);
 
             fireCount = 0;
         }

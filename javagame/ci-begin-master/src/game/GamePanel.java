@@ -1,11 +1,10 @@
 package game;
 
-import tklibs.SpriteUtils;
+import game.enemy.Enemy;
+import game.player.Player;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 public class GamePanel extends JPanel {
     Background background;
@@ -53,5 +52,6 @@ public class GamePanel extends JPanel {
                 object.run();
             }
         }
+        System.out.println(GameObject.objects.size());
     }
 }
