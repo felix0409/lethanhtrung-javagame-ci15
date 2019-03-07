@@ -3,11 +3,8 @@ package game.player;
 import game.GameObject;
 import game.GameWindow;
 import game.Settings;
-import tklibs.SpriteUtils;
+import game.renderer.AnimationRenderer;
 
-import java.awt.*;
-import java.awt.image. a redImage;
-import java.util.ArrayList;
 import java.util.Random;
 
 public class Player extends GameObject {
@@ -15,18 +12,11 @@ public class Player extends GameObject {
     int bulletType;
     int changeBulletCount;
     Random random;
+    String directoryPath;
+
 
     public Player() {
-//        image = SpriteUtils.loadImage("assets/images/players/straight/0.png");
-        images = new ArrayList<>();
-        images.add(SpriteUtils.loadImage("assets/images/players/straight/0.png"));
-        images.add(SpriteUtils.loadImage("assets/images/players/straight/1.png"));
-        images.add(SpriteUtils.loadImage("assets/images/players/straight/2.png"));
-        images.add(SpriteUtils.loadImage("assets/images/players/straight/3.png"));
-        images.add(SpriteUtils.loadImage("assets/images/players/straight/4.png"));
-        images.add(SpriteUtils.loadImage("assets/images/players/straight/5.png"));
-        images.add(SpriteUtils.loadImage("assets/images/players/straight/6.png"));
-
+        renderer = new AnimationRenderer("assets/images/players/straight",10); // đây là phần thầy làm
         position.set(200, 500);
         fireCount = 0;
         bulletType = 1;
@@ -42,6 +32,8 @@ public class Player extends GameObject {
         playerFire();
         changeBulletType();
     }
+
+
 
     private void playerMove() {
         int vX = 0;
@@ -61,21 +53,23 @@ public class Player extends GameObject {
         }
 
         this.velocity.set(vX, vY);
-        this.velocity.setLength(1);
+        this.velocity.setLength(Settings.PLAYER_SPEED);
     }
 
     private void playerLimit() {
-        if(position.x < 0) { // limit player
-            position.x = 0;
+        double offsetWidth = anchor.x * Settings.PLAYER_WIDTH;
+        double offsetHeight = anchor.y * Settings.PLAYER_HEIGHT;
+        if(position.x < offsetWidth) { // limit player
+            position.x = offsetWidth;
         }
-        if(position.x > Settings.BACKGROUND_WIDTH - Settings.PLAYER_WIDTH) {
-            position.x = Settings.BACKGROUND_WIDTH - Settings.PLAYER_WIDTH;
+        if(position.x > Settings.BACKGROUND_WIDTH - offsetWidth) {
+            position.x = Settings.BACKGROUND_WIDTH - offsetWidth;
         }
-        if(position.y < 0) {
-            position.y = 0;
+        if(position.y < offsetHeight) {
+            position.y = offsetHeight;
         }
-        if(position.y > Settings.GAME_HEIGHT - Settings.PLAYER_HEIGHT) {
-            position.y = Settings.GAME_HEIGHT - Settings.PLAYER_HEIGHT;
+        if(position.y > Settings.GAME_HEIGHT - offsetHeight) {
+            position.y = Settings.GAME_HEIGHT - offsetHeight;
         }
     }
 
@@ -85,7 +79,7 @@ public class Player extends GameObject {
             for (int i = 0; i < 1; i++) {
 //                PlayerBullet bullet = new PlayerBullet();
                 PlayerBullet bullet = GameObject.recycle(PlayerBullet.class);
-                bullet.loadImageByType(bulletType);
+//                bullet.loadImageByType(bulletType);
                 bullet.position.set(this.position.x, this.position.y);
                 bullet.velocity.setAngle(-Math.PI * 0.5);
             }
